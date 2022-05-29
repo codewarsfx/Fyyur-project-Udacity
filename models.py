@@ -1,10 +1,11 @@
 import datetime
 from flask_sqlalchemy import SQLAlchemy
 
+
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
-db= SQLAlchemy()
+db = SQLAlchemy()
 
 class Venue(db.Model):
     __tablename__ = 'venue'
@@ -17,17 +18,13 @@ class Venue(db.Model):
     phone = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
-
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
     website_link = db.Column(db.String(120))
     description = db.Column(db.String)
     is_talent =db.Column(db.Boolean, default=False) #looking for talent#  accepts list of genres e.g ['r&b','pop']
-    genres = db.Column(db.Array(db.String(120)))
+    genres = db.Column(db.ARRAY(db.String(120)))
     created_at = db.Column(db.DateTime, default= datetime.datetime.utcnow())
     shows = db.relationship('Show',backref='venue',lazy=True)
-    
-    
-
     def __repr__(self):
       return f'<Venue id={self.id} name={self.name}>'
 
@@ -42,7 +39,7 @@ class Artist(db.Model):
     phone = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
-    genres = db.Column(db.Array(db.String(120)))
+    genres = db.Column(db.ARRAY(db.String(120)))
     created_at = db.Column(db.DateTime, default= datetime.datetime.utcnow())
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
