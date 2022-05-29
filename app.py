@@ -15,7 +15,7 @@ from flask_wtf import Form
 from forms import *
 from flask_migrate import Migrate
 
-from models import Venue,Artist,Show,db
+from models import Venue,Artist,Show,db #import models
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -28,7 +28,6 @@ db.__init__(app)
 
 # TODO: connect to a local postgresql database
 migrate = Migrate(app,db)  #Handles db migrations
-
 
     
 
@@ -91,7 +90,7 @@ def search_venues():
   # seach for Hop should return "The Musical Hop".
   # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
   search_query = request.form.get('search_term') # get search query
-  search_result = Venue.query.filter(Venue.name.ilike('%' + search_query + '%')).all() # get artist by query results
+  search_result = Venue.query.filter(Venue.name.ilike('%' + search_query + '%')).all() # get venue by query results
   search_array= []
   for data in search_result:
     search_array.append({
@@ -219,21 +218,26 @@ def create_venue_submission():
   website_link = request.form.get('website_link')
   seeking_description = request.form.get('seeking_description')
   seeking_talent = True if request.form.get('seeking_talent') =='y' else False 
-  
-  # TODO: modify data to be the data object returned from db insertion
-  try:
-   new_venue = Venue(name=name,description=seeking_description,city=city, state=state, address=address, phone=phone, genres=genres, facebook_link=facebook_link,website_link=website_link, image_link=image_link,  is_talent=seeking_talent)
-   db.session.add(new_venue)
-   db.session.commit()
-   # on successful db insert, flash success
-   flash('Venue ' + new_venue.name + ' was successfully listed!')
-  except:
-    db.session.rollback()
-  # TODO: on unsuccessful db insert, flash an error instead.
-    flash('An error occurred. Venue ' + new_venue.name+ ' could not be listed.','error')
-  finally:
-    db.session.close()
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+
+  venue_form =VenueForm(request.form)
+  if venue_form.validate():
+    # TODO: modify data to be the data object returned from db insertion
+    try:
+      new_venue = Venue(name=name,description=seeking_description,city=city, state=state, address=address, phone=phone, genres=genres, facebook_link=facebook_link,website_link=website_link, image_link=image_link,  is_talent=seeking_talent)
+      db.session.add(new_venue)
+      db.session.commit()
+      # on successful db insert, flash success
+      flash('Venue ' + new_venue.name + ' was successfully listed!')
+    except:
+      db.session.rollback()
+    # TODO: on unsuccessful db insert, flash an error instead.
+      flash('An error occurred. Venue ' + new_venue.name+ ' could not be listed.','error')
+    finally:
+      db.session.close()
+    # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+      return render_template('pages/home.html')
+  else:
+    flash('Form Inputs Invalid please check again')
     return render_template('pages/home.html')
 
 
